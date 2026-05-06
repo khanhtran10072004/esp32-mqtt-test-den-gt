@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Traffic Control Cloud</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.0.1/mqttws31.min.js"></script>
+    <style>
+        body { font-family: sans-serif; text-align: center; background: #eef; }
+        .btn { padding: 15px 25px; margin: 10px; border: none; border-radius: 8px; color: white; font-weight: bold; cursor: pointer; }
+        .red { background: #ff4d4d; } .yellow { background: #ffcc00; color: black; } .green { background: #2ecc71; }
+        .mode { background: #3498db; width: 200px; font-size: 1.2em; }
+        .card { background: white; padding: 20px; border-radius: 15px; display: inline-block; margin: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+    </style>
+</head>
+<body>
+    <h1>Điều Khiển Giao Thông Từ Xa</h1>
+    
+    <div>
+        <button class="btn mode" onclick="sendMQTT('MODE_AUTO')">TỰ ĐỘNG</button>
+        <button class="btn mode" style="background:#555" onclick="sendMQTT('MODE_MANUAL')">THỦ CÔNG</button>
+    </div>
+
+    <div id="controls">
+        <div class="card">
+            <h3>Hệ 1</h3>
+            <button class="btn red" onclick="sendMQTT('H1R')">ĐỎ</button>
+            <button class="btn yellow" onclick="sendMQTT('H1Y')">VÀNG</button>
+            <button class="btn green" onclick="sendMQTT('H1G')">XANH</button>
+        </div>
+        </div>
+
+    <script>
+        // Cấu hình kết nối HiveMQ qua WebSockets
+        var client = new Paho.MQTT.Client("broker.hivemq.com", 8884, "web_" + parseInt(Math.random() * 100));
+
+        client.connect({
+            useSSL: true, // Bắt buộc cho GitHub Pages (HTTPS)
+            onSuccess: onConnect
+        });
+
+        function onConnect() {
+            console.log("Đã kết nối HiveMQ!");
+        }
+
+        function sendMQTT(payload) {
+            var message = new Paho.MQTT.Message(payload);
+            message.destinationName = "nkt/traffic/control";
+            client.send(message);
+        }
+    </script>
+</body>
+</html>
